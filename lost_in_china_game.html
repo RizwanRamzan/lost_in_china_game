@@ -1,0 +1,748 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Space+Mono:wght@400;700&display=swap');
+  :root {
+    --main-bg: #f7f7fc;
+    --main-bg2: #ebf0f8;
+    --accent-bg: #b8d6f5;
+    --card-bg: #fff;
+    --card-border: #e5e8ef;
+    --primary: #3d4a73;
+    --secondary: #79b1e2;
+    --accent-dark: #3582c4;
+    --accent-light: #a0c4fa;
+    --success: #46b38a;
+    --danger: #e7696a;
+    --glow1: #afd7fa;
+    --glow2: #c6e0fc;
+  }
+  body {
+    background: var(--main-bg2);
+  }
+  .background-anim {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    pointer-events: none;
+    background: radial-gradient(circle at 70% 10%, var(--glow1) 20%, transparent 60%),
+      radial-gradient(circle at 30% 80%, var(--glow2) 16%, transparent 64%);
+    animation: bgMove 20s infinite linear alternate;
+  }
+  @keyframes bgMove {
+    from { background-position: 70% 10%, 30% 80%; }
+    to { background-position: 68% 18%, 28% 76%; }
+  }
+
+  .game-wrap {
+    font-family: 'Space Mono', monospace;
+    background: var(--main-bg);
+    min-height: 520px;
+    border-radius: 18px;
+    overflow: hidden;
+    color: var(--primary);
+    position: relative;
+    margin: 0 auto;
+    max-width: 430px;
+    box-shadow: 0 6px 40px 0 #b4c8df42;
+    z-index: 2;
+    border: 1.5px solid var(--card-border);
+  }
+  .scene-header {
+    background: linear-gradient(90deg, #e8f5fd 0%, #e5e8ef 100%);
+    padding: 16px 22px 13px;
+    border-bottom: 1px solid #d3e1f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+  .chapter-tag {
+    font-size: 11px;
+    color: var(--secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .stats-bar {
+    display: flex;
+    gap: 18px;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+  }
+  .stat-label { color: var(--secondary); font-weight: 700;}
+  .stat-val { font-weight: 700; }
+  .stat-money { color: #c8932e; }
+  .stat-energy { color: #34b4bf; }
+  .stat-stress { color: var(--danger); }
+
+  .scene-area {
+    position: relative;
+    padding: 28px 24px 18px;
+    background: var(--main-bg);
+    min-height: 370px;
+    z-index: 1;
+  }
+  .scene-illus {
+    width: 100%;
+    height: 92px;
+    border-radius: 11px;
+    background: linear-gradient(97deg, #f0f8ff 70%, #d3e8fa 100%);
+    border: 1px solid #e5e8ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin-bottom: 21px;
+    overflow: hidden;
+    position: relative;
+  }
+  .scene-illus .bg-glow {
+    position: absolute;
+    width: 260px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--accent-bg) 50%, transparent 100%);
+    filter: blur(30px);
+    opacity: 0.8;
+    left: 0;
+    top: 38px;
+    z-index: 0;
+    animation: illusGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes illusGlow {
+    from { opacity: 0.65;}
+    to { opacity: 1;}
+  }
+  .scene-illus .scene-icon {
+    font-size: 44px;
+    position: relative;
+    z-index: 1;
+    color: var(--primary);
+    text-shadow: 0 3px 12px #c9dceb34;
+  }
+  .scene-illus .scene-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    letter-spacing: 1.5px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .npc-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 13px 15px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    box-shadow: 0 1.5px 8px #a3c5e01a;
+  }
+  .npc-avatar {
+    width: 43px; height: 43px;
+    border-radius: 50%;
+    background: #e0e9f3;
+    border: 2px solid #6ea7e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 0 14px #cbe6fb44 inset;
+  }
+  .npc-info { flex: 1; }
+  .npc-name {
+    font-size: 11px;
+    color: var(--secondary);
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .npc-chinese {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 22px;
+    color: #222;
+    letter-spacing: 4px;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .npc-pinyin {
+    font-size: 12px; color: #6ea7e0; margin-bottom: 2px; font-style: italic;
+  }
+  .npc-hint-btn {
+    font-size: 10px;
+    color: #347dbe;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    padding: 0;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+  .npc-hint-btn:hover { color: #174b81; }
+
+  .situation-box {
+    background: #e9f2fa;
+    border-left: 4px solid var(--accent-dark);
+    padding: 11px 15px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    color: #5584a6;
+    border-radius: 0 7px 7px 0;
+  }
+  .situation-box strong { color: var(--primary); }
+
+  .choices-label {
+    font-size: 11px;
+    color: #6d7d9c;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    margin-bottom: 15px;
+  }
+  .choice-btn {
+    background: #f0f6fe;
+    border: 1px solid #c1def7;
+    border-radius: 8px;
+    padding: 11px 13px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: #4d5996;
+    text-align: left;
+    transition: all 0.18s;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-weight: 600;
+    box-shadow: 0 0 9px #a6cbe82a;
+  }
+  .choice-btn:hover {
+    border-color: var(--accent-dark);
+    background: #e1f0fd;
+    color: #2572c4;
+  }
+  .choice-btn.correct {
+    border-color: var(--success);
+    background: #eafcf7;
+    color: var(--success);
+    animation: pulse-green 0.45s;
+  }
+  .choice-btn.wrong {
+    border-color: var(--danger);
+    background: #fbeaea;
+    color: var(--danger);
+    animation: shake 0.33s;
+  }
+  .choice-btn:disabled {
+    cursor: default;
+    filter: grayscale(0.2);
+    opacity: 0.92;
+  }
+  .choice-key {
+    font-weight: 700;
+    color: var(--accent-dark);
+    font-size: 13px;
+    min-width: 15px;
+  }
+  .choice-btn.correct .choice-key { color: var(--success); }
+  .choice-btn.wrong .choice-key { color: var(--danger); }
+
+  @keyframes pulse-green { 0%,100%{transform:scale(1)} 40%{transform:scale(1.055)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 23%{transform:translateX(-4px)} 77%{transform:translateX(4px)} }
+
+  .feedback-box {
+    padding: 11px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    margin-bottom: 13px;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb {
+    background: #eafcf7;
+    border: 1.3px solid #54e7b2;
+    color: #28b587;
+    font-weight: 600;
+  }
+  .feedback-box.wrong-fb {
+    background: #fff1f2;
+    border: 1.3px solid #eea9ac;
+    color: #e7696a;
+    font-weight: 600;
+  }
+  .feedback-chinese {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 17px;
+    margin-bottom: 3px;
+    color: #374151;
+  }
+  .next-btn {
+    width: 100%;
+    background: var(--secondary);
+    border: 1.2px solid var(--accent-dark);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 12px 4px;
+    border-radius: 9px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    margin-top: 2px;
+    transition: background 0.18s, color 0.18s;
+    display: none;
+    box-shadow: 0 4px 13px #cbe7fd21;
+  }
+  .next-btn:hover { background: var(--accent-dark); color: #e6f1ff; }
+  .next-btn.show { display: block; }
+
+  .progress-bar {
+    height: 3px;
+    background: #d8e8fd;
+    border-radius: 3px 3px 0 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6ac3fd 0%, #52b581 100%);
+    transition: width 0.47s;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .scene-transition {
+    position: absolute; inset: 0;
+    background: rgba(235,248,255,0.91);
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; 
+    z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.33s;
+    border-radius: 18px;
+    box-shadow: 0 0 12px #b3d8fd21 inset;
+  }
+  .scene-transition.show { opacity: 1; pointer-events: all; }
+  .trans-icon { font-size: 51px; }
+  .trans-msg { font-size: 15px; color: var(--secondary); }
+  .trans-result {
+    font-size: 18px; font-weight: 800; letter-spacing: 1.1px;
+    color: var(--success);
+  }
+  .trans-result.bad { color: var(--danger);}
+  .trans-result.good { color: var(--success);}
+
+  .word-bank {
+    display: none; flex-wrap: wrap; gap: 7px;
+    margin-bottom: 13px;
+  }
+  .word-bank.active { display: flex; }
+  .word-tile {
+    background: #edf3fa;
+    border: 1px solid #b2cef0;
+    border-radius: 7px;
+    padding: 8px 13px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    color: #2765a3;
+    cursor: pointer;
+    transition: all 0.16s;
+    user-select: none;
+    font-weight: 700;
+    box-shadow: 0 2px 6px #b3cafd1a;
+  }
+  .word-tile:hover { border-color: var(--accent-dark); background: #e3effc; }
+  .word-tile.placed { opacity: 0.34; cursor: default; }
+  .sentence-slots {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px; min-height: 38px;
+  }
+  .slot {
+    border-bottom: 2px solid #b2cef0;
+    min-width: 43px;
+    padding: 6px 10px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    color: #7aa6c2;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: none;
+    border-radius: 0;
+    font-weight: 600;
+  }
+  .slot.filled {
+    border-color: var(--accent-dark); color: #264f83;
+  }
+  .check-btn {
+    background: #edf3fa;
+    border: 1px solid #b2cef0;
+    color: #527ba7;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 7px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    transition: border-color 0.18s, color 0.18s;
+  }
+  .check-btn:hover {
+    border-color: var(--accent-dark);
+    color: #33a0d7;
+    background: #e1f0fd;
+  }
+
+  /* Responsive: Portrait and Landscape adaptations */
+  @media (orientation: portrait) {
+    .game-wrap {
+      max-width: 99vw;
+      min-height: 530px !important;
+    }
+    .scene-area {padding: 22px 8vw 12px;}
+    .scene-illus {height: 88px;}
+    .slot, .word-tile { font-size: 17px;}
+    .trans-icon {font-size: 58px;}
+  }
+  @media (orientation: landscape) and (max-width: 900px) {
+    .game-wrap {
+      max-width: 90vw;
+      min-height: 410px;
+    }
+    .scene-area {padding: 18px 8vw 9px; min-height: 210px;}
+    .scene-illus {height: 62px;}
+    .slot, .word-tile { font-size: 14px;}
+    .scene-header { padding: 13px 14px 9px;}
+  }
+  /* For smaller screens */
+  @media (max-width: 600px) {
+    .game-wrap {max-width: 99vw;}
+    .scene-header, .scene-area {padding-left: 5vw; padding-right: 5vw;}
+  }
+</style>
+<div class="background-anim"></div>
+<div class="game-wrap" id="gameWrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="scene-header">
+    <span class="chapter-tag" id="chapterTag">Chapter 1 • Airport</span>
+    <div class="stats-bar">
+      <div class="stat"><span class="stat-label">💰</span><span class="stat-val stat-money" id="statMoney">¥500</span></div>
+      <div class="stat"><span class="stat-label">⚡</span><span class="stat-val stat-energy" id="statEnergy">100%</span></div>
+      <div class="stat"><span class="stat-label">😰</span><span class="stat-val stat-stress" id="statStress">0%</span></div>
+    </div>
+  </div>
+
+  <div class="scene-area">
+    <div class="scene-illus">
+      <div class="bg-glow"></div>
+      <span class="scene-icon" id="sceneIcon">✈️</span>
+      <span class="scene-name" id="sceneName">BEIJING AIRPORT</span>
+    </div>
+    <div class="situation-box" id="situationBox">
+      <strong>Situation:</strong> You just landed. The immigration officer looks at you and asks a question. You must answer correctly to pass!
+    </div>
+    <div class="npc-box">
+      <div class="npc-avatar" id="npcAvatar">👮</div>
+      <div class="npc-info">
+        <div class="npc-name" id="npcName">Immigration Officer</div>
+        <div class="npc-chinese" id="npcChinese">你从哪里来？</div>
+        <div class="npc-pinyin" id="npcPinyin">Nǐ cóng nǎlǐ lái?</div>
+        <button class="npc-hint-btn" onclick="toggleHint()">show meaning</button>
+      </div>
+    </div>
+    <div id="hintBox" style="display:none; font-size:12px; color:#428aca; background:#e9f2fa; border-radius:7px; padding:8px 12px; margin-bottom:10px;">
+      💡 This means: <span style="color:#1465b2">"Where do you come from?"</span>
+    </div>
+    <div class="word-bank" id="wordBank"></div>
+    <div class="sentence-slots" id="sentenceSlots"></div>
+    <button class="check-btn" id="checkBtn" onclick="checkBuild()" style="display:none">CHECK ↗</button>
+    <div class="choices-label" id="choicesLabel">CHOOSE YOUR RESPONSE:</div>
+    <div class="choices" id="choicesDiv"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextScene()">NEXT SITUATION →</button>
+  </div>
+  <div class="scene-transition" id="transOverlay">
+    <div class="trans-icon" id="transIcon">✅</div>
+    <div class="trans-result" id="transResult">You survived!</div>
+    <div class="trans-msg" id="transMsg">Entering the city...</div>
+  </div>
+</div>
+
+<script>
+const scenes = [
+  {
+    chapter: "Chapter 1 • Airport",
+    sceneIcon: "✈️",
+    sceneName: "BEIJING AIRPORT",
+    situation: "You just landed. The immigration officer looks at you and asks a question. You must answer to pass!",
+    npcAvatar: "👮",
+    npcName: "Immigration Officer",
+    chinese: "你从哪里来？",
+    pinyin: "Nǐ cóng nǎlǐ lái?",
+    hint: '"Where do you come from?"',
+    type: "choice",
+    choices: [
+      { text: "我来自巴基斯坦 — I am from Pakistan", correct: true },
+      { text: "我很饿 — I am very hungry", correct: false },
+      { text: "谢谢你 — Thank you very much", correct: false },
+      { text: "我不知道 — I don't know", correct: false }
+    ],
+    correctFeedback: "✅ 我来自巴基斯坦 (Wǒ láizì Bājīsītǎn) — Correct! Officer stamps your passport.",
+    wrongFeedback: "❌ Wrong answer! Officer signals security. You lose time & energy.",
+    correctEffect: { money: 0, energy: 0, stress: -5 },
+    wrongEffect: { money: -50, energy: -15, stress: 20 }
+  },
+  {
+    chapter: "Chapter 1 • Airport",
+    sceneIcon: "🧳",
+    sceneName: "LUGGAGE CLAIM",
+    situation: "Your bag didn't come out! You need to talk to the baggage officer and explain your problem.",
+    npcAvatar: "🙍",
+    npcName: "Baggage Officer",
+    chinese: "您好，有什么问题吗？",
+    pinyin: "Nínhǎo, yǒu shénme wèntí ma?",
+    hint: '"Hello, do you have a problem?"',
+    type: "choice",
+    choices: [
+      { text: "我的行李丢了 — My luggage is lost", correct: true },
+      { text: "我要买票 — I want to buy a ticket", correct: false },
+      { text: "在哪里吃饭？ — Where to eat?", correct: false },
+      { text: "不，没问题 — No, no problem", correct: false }
+    ],
+    correctFeedback: "✅ 我的行李丢了 (Wǒ de xíngli diū le) — They start a lost bag report! You're moving forward.",
+    wrongFeedback: "❌ The officer is confused. You wasted 30 minutes.",
+    correctEffect: { money: 0, energy: -5, stress: 0 },
+    wrongEffect: { money: 0, energy: -20, stress: 15 }
+  },
+  {
+    chapter: "Chapter 2 • Street Food",
+    sceneIcon: "🍜",
+    sceneName: "STREET FOOD STALL",
+    situation: "You're starving! A vendor is selling hot noodles. You need to order and tell them — NO SPICY!",
+    npcAvatar: "👨‍🍳",
+    npcName: "Noodle Vendor",
+    chinese: "要什么？辣的还是不辣？",
+    pinyin: "Yào shénme? Là de háishi bù là?",
+    hint: '"What do you want? Spicy or not spicy?"',
+    type: "build",
+    words: ["不", "要", "辣", "一碗", "面条"],
+    answer: ["一碗", "面条", "不", "要", "辣"],
+    correctFeedback: "✅ 一碗面条不要辣 — Perfect! A hot bowl of noodles appears. +20 energy!",
+    wrongFeedback: "❌ You got a bowl of fire-hot noodles. Stress goes up!",
+    correctEffect: { money: -20, energy: 20, stress: -10 },
+    wrongEffect: { money: -20, energy: 5, stress: 15 }
+  },
+  {
+    chapter: "Chapter 3 • Taxi",
+    sceneIcon: "🚕",
+    sceneName: "TAXI STAND",
+    situation: "You need to reach the hotel. The driver asks where you want to go. Choose the correct phrase!",
+    npcAvatar: "🚗",
+    npcName: "Taxi Driver",
+    chinese: "去哪儿啊？",
+    pinyin: "Qù nǎr a?",
+    hint: '"Where are you going?"',
+    type: "choice",
+    choices: [
+      { text: "去北京饭店，谢谢 — To Beijing Hotel, thank you", correct: true },
+      { text: "我不会中文 — I don't know Chinese", correct: false },
+      { text: "多少钱？— How much?", correct: false },
+      { text: "请停车 — Please stop the car", correct: false }
+    ],
+    correctFeedback: "✅ 去北京饭店！Driver nods and starts driving. Great survival!",
+    wrongFeedback: "❌ The driver is confused. You ended up on the wrong side of Beijing!",
+    correctEffect: { money: -60, energy: 0, stress: -10 },
+    wrongEffect: { money: -120, energy: -10, stress: 25 }
+  }
+];
+
+let current = 0;
+let stats = { money: 500, energy: 100, stress: 0 };
+let buildAnswer = [];
+let buildWords = [];
+let answered = false;
+
+function renderScene() {
+  const s = scenes[current];
+  answered = false;
+  document.getElementById('chapterTag').textContent = s.chapter;
+  document.getElementById('sceneIcon').textContent = s.sceneIcon;
+  document.getElementById('sceneName').textContent = s.sceneName;
+  document.getElementById('situationBox').innerHTML = '<strong>Situation:</strong> ' + s.situation;
+  document.getElementById('npcAvatar').textContent = s.npcAvatar;
+  document.getElementById('npcName').textContent = s.npcName;
+  document.getElementById('npcChinese').textContent = s.chinese;
+  document.getElementById('npcPinyin').textContent = s.pinyin;
+  document.getElementById('hintBox').style.display = 'none';
+  document.getElementById('hintBox').innerHTML = '💡 This means: <span style="color:#1465b2">' + s.hint + '</span>';
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('feedbackBox').innerHTML = '';
+  document.getElementById('nextBtn').className = 'next-btn';
+
+  const progressFill = document.getElementById('progressFill');
+  progressFill.style.width = ((current / scenes.length) * 100) + '%';
+
+  if (s.type === 'choice') {
+    document.getElementById('wordBank').className = 'word-bank';
+    document.getElementById('sentenceSlots').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('choicesLabel').style.display = 'block';
+    document.getElementById('choicesDiv').style.display = 'grid';
+
+    const div = document.getElementById('choicesDiv');
+    const keys = ['A', 'B', 'C', 'D'];
+    div.innerHTML = '';
+    s.choices.forEach((c, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = '<span class="choice-key">' + keys[i] + '</span><span>' + c.text + '</span>';
+      btn.onclick = () => selectChoice(i);
+      div.appendChild(btn);
+    });
+  } else if (s.type === 'build') {
+    document.getElementById('choicesLabel').textContent = 'BUILD THE CORRECT SENTENCE:';
+    document.getElementById('choicesDiv').style.display = 'none';
+    document.getElementById('wordBank').className = 'word-bank active';
+    document.getElementById('sentenceSlots').style.display = 'flex';
+    document.getElementById('checkBtn').style.display = 'inline-block';
+    buildAnswer = [];
+    buildWords = [...s.words];
+    renderBuild();
+  }
+}
+
+function renderBuild() {
+  const s = scenes[current];
+  const wb = document.getElementById('wordBank');
+  wb.innerHTML = '';
+  buildWords.forEach((w, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'word-tile' + (buildAnswer.includes(i) ? ' placed' : '');
+    tile.textContent = w;
+    tile.onclick = () => placeTile(i);
+    wb.appendChild(tile);
+  });
+  const slots = document.getElementById('sentenceSlots');
+  slots.innerHTML = '';
+  buildAnswer.forEach((wi, pos) => {
+    const slot = document.createElement('div');
+    slot.className = 'slot filled';
+    slot.textContent = buildWords[wi];
+    slot.onclick = () => removeTile(pos);
+    slots.appendChild(slot);
+  });
+  if (buildAnswer.length === 0) {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'slot';
+    placeholder.textContent = '点击词语...';
+    placeholder.style.fontSize = '12px';
+    placeholder.style.color = '#a4bfd7';
+    slots.appendChild(placeholder);
+  }
+}
+
+function placeTile(i) {
+  if (buildAnswer.includes(i) || answered) return;
+  buildAnswer.push(i);
+  renderBuild();
+}
+
+function removeTile(pos) {
+  if (answered) return;
+  buildAnswer.splice(pos, 1);
+  renderBuild();
+}
+
+function checkBuild() {
+  if (answered) return;
+  const s = scenes[current];
+  const userSentence = buildAnswer.map(i => buildWords[i]);
+  const correct = JSON.stringify(userSentence) === JSON.stringify(s.answer);
+  answered = true;
+  applyFeedback(correct);
+}
+
+function selectChoice(i) {
+  if (answered) return;
+  const s = scenes[current];
+  answered = true;
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[i].className = 'choice-btn ' + (s.choices[i].correct ? 'correct' : 'wrong');
+  if (!s.choices[i].correct) {
+    s.choices.forEach((c, j) => { if (c.correct) btns[j].className = 'choice-btn correct'; });
+  }
+  applyFeedback(s.choices[i].correct);
+}
+
+function applyFeedback(correct) {
+  const s = scenes[current];
+  const effect = correct ? s.correctEffect : s.wrongEffect;
+  stats.money = Math.max(0, stats.money + effect.money);
+  stats.energy = Math.min(100, Math.max(0, stats.energy + effect.energy));
+  stats.stress = Math.min(100, Math.max(0, stats.stress + effect.stress));
+  updateStats();
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box show ' + (correct ? 'correct-fb' : 'wrong-fb');
+  fb.textContent = correct ? s.correctFeedback : s.wrongFeedback;
+  document.getElementById('nextBtn').className = 'next-btn show';
+}
+
+function updateStats() {
+  document.getElementById('statMoney').textContent = '¥' + stats.money;
+  document.getElementById('statEnergy').textContent = stats.energy + '%';
+  document.getElementById('statStress').textContent = stats.stress + '%';
+}
+
+function toggleHint() {
+  const h = document.getElementById('hintBox');
+  h.style.display = h.style.display === 'none' ? 'block' : 'none';
+}
+
+function nextScene() {
+  current++;
+  if (current >= scenes.length) {
+    showEndScreen();
+    return;
+  }
+  const overlay = document.getElementById('transOverlay');
+  const s = scenes[current];
+  document.getElementById('transIcon').textContent = s.sceneIcon;
+  document.getElementById('transResult').textContent = 'Moving to next location...';
+  document.getElementById('transMsg').textContent = s.sceneName;
+  overlay.className = 'scene-transition show';
+  setTimeout(() => {
+    overlay.className = 'scene-transition';
+    renderScene();
+  }, 1400);
+}
+
+function showEndScreen() {
+  const wrap = document.getElementById('gameWrap');
+  const survived = stats.energy > 20 && stats.stress < 80;
+  wrap.innerHTML = `
+    <div style="min-height:520px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:32px; text-align:center; background:#f7f7fc; border-radius:18px; font-family:'Space Mono',monospace;">
+      <div style="font-size:54px;">${survived ? '🏆' : '😵'}</div>
+      <div style="font-size:20px; font-weight:700; color:${survived ? '#28b587' : '#e7696a'};">${survived ? 'YOU SURVIVED CHINA!' : 'GAME OVER — TRY AGAIN!'}</div>
+      <div style="font-size:13px; color:#6ea7e0; line-height:1.8;">
+        Final Stats: 💰 ¥${stats.money} • ⚡ ${stats.energy}% • 😰 ${stats.stress}%<br>
+        You completed all 4 survival scenarios.<br>
+        你很棒！(Nǐ hěn bàng!) — You're amazing!
+      </div>
+      <div style="font-size:12px; color:#428aca; max-width:300px; line-height:1.7;">Words learned: 你从哪里来 · 我来自 · 行李丢了 · 不要辣 · 去哪儿 · 面条</div>
+      <button onclick="location.reload()" style="margin-top:12px; background:#79b1e2; border:1.3px solid #3d79bf; color:#fff; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; padding:11px 25px; border-radius:9px; cursor:pointer; letter-spacing:1px;">PLAY AGAIN ↺</button>
+    </div>`;
+}
+renderScene();
+</script>
